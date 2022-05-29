@@ -56,13 +56,6 @@ const Chat = () => {
         });
 	}, []);
 
-	useEffect(() => {
-		if (localStorage.getItem('id') === null) {
-			navigate('/login');
-		}
-
-	}, [navigate]);
-
 	const sendMessage = (messageBody: string) => {
         socket.emit(NEW_CHAT_MESSAGE_EVENT, {
             body: messageBody,
