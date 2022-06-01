@@ -17,13 +17,17 @@ import {
 	Profile,
 	GroupImage,
 	ProfileCard,
-	ExitCard
+	ExitCard,
+	MsgContainer,
+	Msg,
+	MsgInfo,
+	MsgTime,
+	MsgText
 } from './style';
 
 import { socket } from '../../service/socket';
-import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {  useEffect,  useState } from 'react';
 import Login from '../Login';
 
@@ -31,33 +35,47 @@ const logo = require('../../assets/group.png');
 const  { solid } = require('@fortawesome/fontawesome-svg-core/import.macro');
 
 const USER_JOIN = "join";
-const NEW_CHAT_MESSAGE_EVENT = "msg";
+const UPDATE_USERS_EVENT = "users update";
+const NEW_CHAT_MESSAGE_EVENT = "update messages";
+const SEND_CHAT_MESSAGE_EVENT = "msg";
 
 interface Message {
+	name: string;
     senderId: string;
-    body: string;
+    text: string;
+}
+interface User {
+	id: string;
+	name: string;
 }
 
 const Chat = () => {
-	const navigate = useNavigate();
 	const [logged, setLogged] = useState(false);
 	const [openDrawer, setOpenDrawer] = useState(false);
 	const [message, setMessage] = useState<string>("");
 	const [messages, setMessages] = useState<Message[]>([]);
+	const [users, setUsers] = useState<User[]>([]);
 
 	useEffect(() => {
-
-		socket.on(NEW_CHAT_MESSAGE_EVENT, (message: { senderId: string, body: string }) => {
-            const incomingMessage = {
-                ...message,
-                ownedByCurrentUser: message.senderId === socket.id,
-            };
-            setMessages((messages) => [...messages, incomingMessage]);
+		socket.on(NEW_CHAT_MESSAGE_EVENT, (updatedMessages) => {
+            setMessages(updatedMessages);
+			setTimeout(() => {
+				document.querySelector('.body')?.scrollTo({ top: document.querySelector('.body')?.scrollHeight, behavior: 'smooth' });
+			}, 100);
         });
+
+		socket.on(UPDATE_USERS_EVENT, (users) => {
+			let usersArray = [];
+			for (const key in users) {
+				usersArray.push({ id: key, name: users[key] });
+			}
+
+			setUsers(usersArray);
+		});
 	}, []);
 
 	const sendMessage = (messageBody: string) => {
-        socket.emit(NEW_CHAT_MESSAGE_EVENT, {
+        socket.emit(SEND_CHAT_MESSAGE_EVENT, {
             body: messageBody,
             senderId: socket.id,
         });
@@ -91,13 +109,17 @@ const Chat = () => {
 				<SidebarBody>
 					<p>Online:</p>
 					<SidebarBodyUsers>
-						<SidebarBodyUser>
-							<ProfileIcon hash={'#b49ff4'}>D</ProfileIcon>
-							<div>
-								<p>Daniel Victor</p>
-								<span>Há 3 minutos</span>
-							</div>
-						</SidebarBodyUser>
+						{
+							users.map((user: User) => (
+								<SidebarBodyUser key={user.name}>
+									<ProfileIcon hash={'#b49ff4'}>D</ProfileIcon>
+									<div>
+										<p>{ user.name }</p>
+										<span>Há 3 minutos</span>
+									</div>
+								</SidebarBodyUser>
+							))
+						}
 					</SidebarBodyUsers>
 				</SidebarBody>
 			</Sidebar>
@@ -112,12 +134,27 @@ const Chat = () => {
 					</div>
 					<FontAwesomeIcon onClick={() => setOpenDrawer(!openDrawer)} icon={solid('bars')} />
 				</Header>
-				<Body>
+				<Body className="body">
+					<AnimatePresence>
 					{
-						messages.map((message, index) => {
-							return (<p>{ message.body }</p>);
-						})
+						messages.map((message, index) =>(
+							<MsgContainer 
+								className={socket.id === message.senderId ? 'own' : ''} as={motion.div} 
+								initial={{ opacity: 0, x: -100 }}
+								animate={{ opacity: 1, x: 0 }}
+								exit={{ opacity: 0 }}
+							>
+								<Msg className={socket.id === message.senderId ? 'own' : ''}>
+									<MsgInfo>
+										<p className='msg-user'>{message.name}</p>
+										<MsgTime>{'14:23'}</MsgTime>
+									</MsgInfo>
+									<MsgText>{message.text}</MsgText>
+								</Msg>
+							</MsgContainer>
+						))
 					}
+					</AnimatePresence>
 				</Body>
 				<Footer>
 					<UserTyping></UserTyping>

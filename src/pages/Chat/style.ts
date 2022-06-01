@@ -224,56 +224,57 @@ export const SpanAlert = styled.div `
         padding: 10px;
         background-color: #FFF;
         border-radius: 2px;
-        /* box-shadow: 0px 3px 5px -3px rgba(0,0,0,0.75); */
         margin: 10px 0;
         font-size: 12px;
         max-width: 200px;
     }
 `;
 
-// .msg-container {
-//     width: 100%;
-//     display: flex;
-//     justify-content: flex-start;
-//     margin: 5px 0;
-// }
+export const MsgContainer = styled.div `
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin: 5px 0;
 
-// .msg-container.own {
-//     justify-content: flex-end !important;
-// }
+    &.own {
+        justify-content: flex-end !important;
+    }
+`;
 
-// .msg {
-//     background-color: #FFF;
-//     max-width: 65%;
-//     padding: 20px;
-//     border-radius: 3px;
-//     position: relative;
-//     height: max-content;
-// }
+export const Msg = styled.div `
+    background-color: #FFF;
+    max-width: 65%;
+    padding: 10px 15px;
+    border-radius: 5px;
+    position: relative;
+    height: max-content;
+    box-shadow: 0px 2px 20px 0px rgba(0,0,0,0.05);
 
-// .msg.own {
-//     background-color: #e9d5ff;
-// }
+    &.own {
+        background-color: ${props => props.theme.primary};
+        color: white;
+    }
+`;
 
-// .msg-info {
-//     display: flex;
-//     flex-direction: row;
-//     justify-content: flex-start;
-//     align-items: baseline;
-//     margin-bottom: 10px;
-//     font-size: 12px;
-// }
+export const MsgInfo = styled.div `
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+    margin-bottom: 10px;
+    font-size: 12px;
+`;
 
-// .msg-text {
-//     word-break: break-word;
-//     font-size: 1em;
-// }
+export const MsgText = styled.p `
+    word-break: break-word;
+    font-size: 1em;
+`;
 
-// .msg-time {
-//     color: #a3a3a3;
-//     font-size: 12px;
-//     margin-left: 5px;
-// }
+export const MsgTime = styled.p `
+    color: #a3a3a3;
+    font-size: 12px;
+    margin-left: 5px;
+`;
 
 // .msg .msg-user {
 //     color: #8141ca;
